@@ -907,6 +907,12 @@ static int hostapd_enable_iface_cb(struct hostapd_iface *hapd_iface)
 
     bss->conf->start_disabled = 0;
 
+    if (hostapd_config_check(hapd_iface->conf, 1) < 0)
+    {
+        wpa_printf(MSG_INFO, "Invalid configuration - cannot enable");
+        return -1;
+    }
+
     if (hostapd_setup_interface(hapd_iface))
     {
         wpa_printf(MSG_ERROR, "Failed to initialize hostapd interface");

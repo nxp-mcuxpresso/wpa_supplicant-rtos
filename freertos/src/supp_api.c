@@ -949,8 +949,16 @@ static int hostapd_update_bss(struct hostapd_iface *hapd_s, struct wlan_network 
     conf->channel = network->channel;
     conf->acs     = conf->channel == 0;
 
-    conf->spectrum_mgmt_required = 1;
-    conf->local_pwr_constraint = 3;
+    if(conf->ieee80211d)
+    {
+		conf->spectrum_mgmt_required = 1;
+		conf->local_pwr_constraint = 3;
+    }
+    else
+    {
+		conf->spectrum_mgmt_required = 0;
+		conf->local_pwr_constraint = -1;
+    }
 
     conf->obss_interval = 10;
 
@@ -1807,6 +1815,12 @@ int wpa_supp_add_network(const struct netif *dev, struct wlan_network *network)
                 {
                     str_clear_free(ssid->eap.cert.domain_match);
                     ssid->eap.cert.domain_match = dup_binstr(network->security.domain_match, os_strlen(network->security.domain_match));
+                }
+
+                if (os_strlen(network->security.domain_suffix_match))
+                {
+                    str_clear_free(ssid->eap.cert.domain_suffix_match);
+                    ssid->eap.cert.domain_suffix_match = dup_binstr(network->security.domain_suffix_match, os_strlen(network->security.domain_suffix_match));
                 }
 
                 if (os_strlen(network->security.ca_cert_hash))

@@ -361,7 +361,7 @@ void *pvPortCalloc(size_t num, size_t size); /*Calloc for HEAP3.*/
 /* More info: https://tls.mbed.org/kb/how-to/reduce-mbedtls-memory-and-storage-footprint */
 #define MBEDTLS_ECP_FIXED_POINT_OPTIM 1 /* To reduce peak memory usage */
 #define MBEDTLS_AES_ROM_TABLES
-#define MBEDTLS_SSL_MAX_CONTENT_LEN (1024 * 4) /* Reduce SSL frame buffer. */
+#define MBEDTLS_SSL_MAX_CONTENT_LEN (1024 * 8) /* Reduce SSL frame buffer. */
 #define MBEDTLS_MPI_WINDOW_SIZE 1
 #define MBEDTLS_ECP_WINDOW_SIZE 2
 #define MBEDTLS_MPI_MAX_SIZE 512 /* Maximum number of bytes for usable MPIs. */
