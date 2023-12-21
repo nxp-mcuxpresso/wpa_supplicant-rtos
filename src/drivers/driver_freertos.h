@@ -8,12 +8,18 @@
 #ifndef DRIVER_FREERTOS_H
 #define DRIVER_FREERTOS_H
 
+#ifndef CONFIG_ZEPHYR
 #include "lwip/netif.h"
+#endif
 
 #include "driver.h"
 #include "wpa_supplicant_i.h"
 #include "bss.h"
+#ifdef CONFIG_ZEPHYR
+#include "l2_packet/l2_packet.h"
+#else
 #include "l2_packet.h"
+#endif
 
 struct freertos_drv_ctx
 {
@@ -95,6 +101,8 @@ struct freertos_wpa_supp_dev_callbk_fns
     void (*eapol_rx)(struct freertos_drv_if_ctx *if_ctx, union wpa_event_data *event);
 
     void (*signal_change)(struct freertos_drv_if_ctx *if_ctx, union wpa_event_data *event);
+
+    void (*ecsa_complete)(struct freertos_drv_if_ctx *if_ctx, union wpa_event_data *event);
 };
 
 struct freertos_hostapd_dev_callbk_fns
@@ -114,6 +122,8 @@ struct freertos_hostapd_dev_callbk_fns
     void (*eapol_rx)(struct freertos_drv_if_ctx *if_ctx, union wpa_event_data *event);
 
     void (*mgmt_tx_status)(struct freertos_drv_if_ctx *if_ctx, const u8 *frame, size_t len, bool ack);
+
+    void (*ecsa_complete)(struct freertos_drv_if_ctx *if_ctx, union wpa_event_data *event);
 };
 
 struct freertos_wpa_supp_dev_ops
@@ -175,6 +185,8 @@ struct freertos_wpa_supp_dev_ops
     int (*stop_ap)(void *if_priv);
     int (*deinit_ap)(void *if_priv);
     int (*set_acl)(void *if_priv, struct hostapd_acl_params *params);
+    int (*dpp_listen)(void *priv, bool enable);
+    bool (*get_modes)(void *if_priv);
 };
 
 #endif /* DRIVER_FREERTOS_H */

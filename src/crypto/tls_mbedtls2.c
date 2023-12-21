@@ -43,7 +43,7 @@
  */
 
 #include "includes.h"
-#include "common.h"
+#include "utils/common.h"
 
 #ifdef CONFIG_WPA_SUPP_CRYPTO
 
@@ -61,7 +61,12 @@
 
 #ifdef MBEDTLS_DEBUG_C
 #define DEBUG_THRESHOLD 4
+#include <mbedtls/debug.h>
+#ifdef CONFIG_ZEPHYR
+#define PRINTF printk
+#else
 #include "fsl_debug_console.h"
+#endif
 #define tls_mbedtls_d(...) PRINTF("tls_mbedtls", ##__VA_ARGS__)
 #else
 #define tls_mbedtls_d(...)
@@ -322,10 +327,10 @@ void tls_mbedtls_set_debug_cb(mbedtls_ssl_config *conf,
     {
         /**
          * If 'NULL' dbg function and already set 'g_f_dbg',
-         * we will not override it.
+         * we will not override 'g_f_dbg',
+         * but set it in conf.
          */
-        elog(-1, "Cannot override dbg function");
-        return;
+        mbedtls_ssl_conf_dbg(conf, g_f_dbg, NULL);
     }
     else if (f_dbg)
     {
@@ -3113,7 +3118,7 @@ static int tls_mbedtls_verify_cb(void *arg, mbedtls_x509_crt *crt, int depth, ui
     struct tls_conf *tls_conf   = conn->tls_conf;
     uint32_t flags_in           = *flags;
 
-#ifdef TLS_MBEDTLS_CERT_DISABLE_KEY_USAGE_CHECK
+#if defined(TLS_MBEDTLS_CERT_DISABLE_KEY_USAGE_CHECK) && !defined(CONFIG_ZEPHYR)
     crt->ext_types &= ~MBEDTLS_X509_EXT_KEY_USAGE;
     crt->ext_types &= ~MBEDTLS_X509_EXT_EXTENDED_KEY_USAGE;
 #endif
@@ -3195,7 +3200,13 @@ static int tls_mbedtls_verify_cb(void *arg, mbedtls_x509_crt *crt, int depth, ui
         {
             /* check RSA modulus size (public key bitlen) */
             const mbedtls_pk_type_t pk_alg = mbedtls_pk_get_type(&crt->pk);
-            if ((pk_alg == MBEDTLS_PK_RSA || pk_alg == MBEDTLS_PK_RSASSA_PSS) && mbedtls_pk_get_bitlen(&crt->pk) < 3072)
+            if ((pk_alg == MBEDTLS_PK_RSA || pk_alg == MBEDTLS_PK_RSASSA_PSS)
+#ifdef CONFIG_SUITEB192
+                && mbedtls_pk_get_bitlen(&crt->pk) < 3072
+#else
+                && mbedtls_pk_get_bitlen(&crt->pk) < 2048
+#endif
+                )
             {
                 /* hwsim suite_b RSA tests expect 3072
                  *   suite_b_192_rsa_ecdhe_radius_rsa2048_client
