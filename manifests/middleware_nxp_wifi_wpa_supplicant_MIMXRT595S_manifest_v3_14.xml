@@ -1,0 +1,625 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ksdk:manifest xmlns:ksdk="http://nxp.com/ksdk/2.0/ksdk_manifest_v3.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="SDK_2.x_middleware_nxp_wifi_wpa_supplicant_MIMXRT595S_manifest_v3_14" name="wpa_supplicant-rtos" brief="NXP Wi-Fi WPA Supplicant" format_version="3.14" api_version="2.0.0" xsi:schemaLocation="http://nxp.com/ksdk/2.0/ksdk_manifest_v3.0.xsd http://nxp.com/mcuxpresso/sdk/sdk_manifest_v3.14.xsd">
+
+  <externalDefinitions>
+    <definition extID="middleware.freertos-kernel.MIMXRT595S"/>
+    <definition extID="utility.debug_console.MIMXRT595S"/>
+    <definition extID="component.osa_free_rtos.MIMXRT595S"/>
+    <definition extID="middleware.wifi.MIMXRT595S"/>
+    <definition extID="middleware.lwip.MIMXRT595S"/>
+    <definition extID="middleware.mbedtls.MIMXRT595S"/>
+    <definition extID="MIMXRT595S"/>
+    <definition extID="armgcc"/>
+  </externalDefinitions>
+  <ksdk id="MCUXpressoSDK2150_middleware_nxp_wifi_wpa_supplicant_MIMXRT595S_manifest_v3_14" name="MCUXpressoSDK2150_middleware_nxp_wifi_wpa_supplicant_MIMXRT595S_manifest_v3_14" version="2.15.0" revision="2.15.0"/>
+  <components>
+    <component id="middleware.wireless.wpa_supplicant.rtos.MIMXRT595S" name="wpa_supplicant-rtos" brief="Wpa supplicant rtos" version="2.11.0" full_name="Wpa supplicant rtos" category="Wireless/wpa_supplicant" user_visible="true" type="middleware" package_base_path=".././" project_base_path="wpa_supplicant-rtos">
+      <defines>
+        <define name="USE_RTOS" value="1"/>
+        <define name="SDK_OS_FREE_RTOS" value=""/>
+        <define name="FSL_OSA_TASK_ENABLE" value="1"/>
+        <define name="PRINTF_ADVANCED_ENABLE" value="1"/>
+        <define name="MBEDTLS_CONFIG_FILE" value="'&quot;wpa_supp_mbedtls_config.h&quot;'"/>
+      </defines>
+      <dependencies>
+        <all>
+          <component_dependency value="middleware.freertos-kernel.MIMXRT595S"/>
+          <component_dependency value="utility.debug_console.MIMXRT595S"/>
+          <component_dependency value="component.osa_free_rtos.MIMXRT595S"/>
+          <component_dependency value="middleware.wifi.MIMXRT595S"/>
+          <component_dependency value="middleware.lwip.MIMXRT595S"/>
+          <component_dependency value="middleware.mbedtls.MIMXRT595S"/>
+          <device_dependency value="MIMXRT595S"/>
+        </all>
+      </dependencies>
+      <source relative_path="./port/mbedtls" project_relative_path="port/mbedtls" type="c_include">
+        <files mask="wpa_supp_mbedtls_config.h"/>
+        <files mask="wpa_supp_els_pkc_mbedtls_config.h"/>
+        <files mask="wpa_supp_ele_s400_mbedtls_config.h"/>
+      </source>
+      <source relative_path="./src/common" project_relative_path="src/common" type="src">
+        <files mask="wpa_common.c"/>
+        <files mask="ieee802_11_common.c"/>
+        <files mask="hw_features_common.c"/>
+        <files mask="wpa_ctrl.c"/>
+        <files mask="cli.c"/>
+        <files mask="sae.c"/>
+        <files mask="dragonfly.c"/>
+        <files mask="gas.c"/>
+        <files mask="dpp.c"/>
+        <files mask="dpp_auth.c"/>
+        <files mask="dpp_backup.c"/>
+        <files mask="dpp_crypto.c"/>
+        <files mask="dpp_pkex.c"/>
+        <files mask="dpp_reconfig.c"/>
+        <files mask="dpp_tcp.c"/>
+        <files mask="gas_server.c"/>
+      </source>
+      <source relative_path="./src/drivers" project_relative_path="src/drivers" type="src">
+        <files mask="driver_common.c"/>
+        <files mask="drivers.c"/>
+        <files mask="driver_freertos.c"/>
+      </source>
+      <source relative_path="./src/l2_packet" project_relative_path="src/l2_packet" type="c_include">
+        <files mask="l2_packet.h"/>
+      </source>
+      <source relative_path="./src/l2_packet" project_relative_path="src/l2_packet" type="src">
+        <files mask="l2_packet_freertos.c"/>
+      </source>
+      <source relative_path="./src/utils" project_relative_path="src/utils" type="src">
+        <files mask="base64.c"/>
+        <files mask="common.c"/>
+        <files mask="wpabuf.c"/>
+        <files mask="bitfield.c"/>
+        <files mask="os_freertos.c"/>
+        <files mask="crc32.c"/>
+        <files mask="ip_addr.c"/>
+        <files mask="block_alloc.c"/>
+        <files mask="wpa_debug.c"/>
+        <files mask="uuid.c"/>
+        <files mask="eloop_freertos.c"/>
+        <files mask="json.c"/>
+      </source>
+      <source relative_path="./src/utils" project_relative_path="src/utils" type="c_include">
+        <files mask="dl_list.h"/>
+        <files mask="base64.h"/>
+        <files mask="bitfield.h"/>
+        <files mask="block_alloc.h"/>
+        <files mask="browser.h"/>
+        <files mask="build_config.h"/>
+        <files mask="common.h"/>
+        <files mask="config.h"/>
+        <files mask="const_time.h"/>
+        <files mask="crc32.h"/>
+        <files mask="edit.h"/>
+        <files mask="eloop.h"/>
+        <files mask="ext_password.h"/>
+        <files mask="ext_password_i.h"/>
+        <files mask="http-utils.h"/>
+        <files mask="includes.h"/>
+        <files mask="ip_addr.h"/>
+        <files mask="json.h"/>
+        <files mask="module_tests.h"/>
+        <files mask="os.h"/>
+        <files mask="pcsc_funcs.h"/>
+        <files mask="platform.h"/>
+        <files mask="state_machine.h"/>
+        <files mask="trace.h"/>
+        <files mask="uuid.h"/>
+        <files mask="wpabuf.h"/>
+        <files mask="wpa_debug.h"/>
+        <files mask="xml-utils.h"/>
+      </source>
+      <source relative_path="./wpa_supplicant" project_relative_path="wpa_supplicant" type="c_include">
+        <files mask="ap.h"/>
+        <files mask="autoscan.h"/>
+        <files mask="bgscan.h"/>
+        <files mask="bss.h"/>
+        <files mask="bssid_ignore.h"/>
+        <files mask="config.h"/>
+        <files mask="config_ssid.h"/>
+        <files mask="ctrl_iface.h"/>
+        <files mask="dpp_supplicant.h"/>
+        <files mask="driver_i.h"/>
+        <files mask="gas_query.h"/>
+        <files mask="hs20_supplicant.h"/>
+        <files mask="ibss_rsn.h"/>
+        <files mask="interworking.h"/>
+        <files mask="mesh.h"/>
+        <files mask="mesh_mpm.h"/>
+        <files mask="mesh_rsn.h"/>
+        <files mask="notify.h"/>
+        <files mask="offchannel.h"/>
+        <files mask="p2p_supplicant.h"/>
+        <files mask="scan.h"/>
+        <files mask="sme.h"/>
+        <files mask="wifi_display.h"/>
+        <files mask="wmm_ac.h"/>
+        <files mask="wnm_sta.h"/>
+        <files mask="wpas_glue.h"/>
+        <files mask="wpas_kay.h"/>
+        <files mask="wpa_supplicant_i.h"/>
+        <files mask="wps_supplicant.h"/>
+      </source>
+      <source relative_path="./wpa_supplicant/binder" project_relative_path="wpa_supplicant/binder" type="c_include">
+        <files mask="binder.h"/>
+      </source>
+      <source relative_path="./wpa_supplicant/dbus" project_relative_path="wpa_supplicant/dbus" type="c_include">
+        <files mask="dbus_common.h"/>
+        <files mask="dbus_new.h"/>
+      </source>
+      <source relative_path="./freertos/src" project_relative_path="freertos/src" type="c_include">
+        <files mask="supp_main.h"/>
+        <files mask="supp_api.h"/>
+        <files mask="wpa_cli.h"/>
+      </source>
+      <source relative_path="./freertos/src" project_relative_path="freertos/src" type="src">
+        <files mask="wpa_cli.c"/>
+        <files mask="supp_main.c"/>
+        <files mask="supp_api.c"/>
+      </source>
+      <source relative_path="./wpa_supplicant" project_relative_path="wpa_supplicant" type="src">
+        <files mask="config.c"/>
+        <files mask="notify.c"/>
+        <files mask="bss.c"/>
+        <files mask="eap_register.c"/>
+        <files mask="op_classes.c"/>
+        <files mask="rrm.c"/>
+        <files mask="wmm_ac.c"/>
+        <files mask="config_none.c"/>
+        <files mask="sme.c"/>
+        <files mask="wpa_supplicant.c"/>
+        <files mask="events.c"/>
+        <files mask="bssid_ignore.c"/>
+        <files mask="wpas_glue.c"/>
+        <files mask="scan.c"/>
+        <files mask="robust_av.c"/>
+        <files mask="ctrl_iface.c"/>
+        <files mask="ctrl_iface_udp.c"/>
+        <files mask="mbo.c"/>
+        <files mask="wnm_sta.c"/>
+        <files mask="ap.c"/>
+        <files mask="p2p_supplicant.c"/>
+        <files mask="p2p_supplicant_sd.c"/>
+        <files mask="gas_query.c"/>
+        <files mask="offchannel.c"/>
+        <files mask="wps_supplicant.c"/>
+        <files mask="dpp_supplicant.c"/>
+        <files mask="interworking.c"/>
+      </source>
+      <source relative_path="./wpa_supplicant" project_relative_path="wpa_supplicant" type="other">
+        <files mask="README"/>
+      </source>
+      <source relative_path="./src/ap" project_relative_path="src/ap" type="src">
+        <files mask="ap_config.c"/>
+        <files mask="ap_drv_ops.c"/>
+        <files mask="ap_list.c"/>
+        <files mask="ap_mlme.c"/>
+        <files mask="authsrv.c"/>
+        <files mask="beacon.c"/>
+        <files mask="bss_load.c"/>
+        <files mask="dfs.c"/>
+        <files mask="drv_callbacks.c"/>
+        <files mask="eap_user_db.c"/>
+        <files mask="hostapd.c"/>
+        <files mask="hw_features.c"/>
+        <files mask="ieee802_11_auth.c"/>
+        <files mask="ieee802_11.c"/>
+        <files mask="ieee802_11_he.c"/>
+        <files mask="ieee802_11_ht.c"/>
+        <files mask="ieee802_11_shared.c"/>
+        <files mask="ieee802_11_vht.c"/>
+        <files mask="ieee802_1x.c"/>
+        <files mask="neighbor_db.c"/>
+        <files mask="p2p_hostapd.c"/>
+        <files mask="pmksa_cache_auth.c"/>
+        <files mask="preauth_auth.c"/>
+        <files mask="rrm.c"/>
+        <files mask="sta_info.c"/>
+        <files mask="tkip_countermeasures.c"/>
+        <files mask="utils.c"/>
+        <files mask="wmm.c"/>
+        <files mask="ctrl_iface_ap.c"/>
+        <files mask="mbo_ap.c"/>
+        <files mask="wpa_auth.c"/>
+        <files mask="wpa_auth_ie.c"/>
+        <files mask="wpa_auth_ft.c"/>
+        <files mask="wpa_auth_glue.c"/>
+        <files mask="wps_hostapd.c"/>
+        <files mask="wnm_ap.c"/>
+        <files mask="eth_p_oui.c"/>
+        <files mask="acs.c"/>
+        <files mask="dpp_hostapd.c"/>
+        <files mask="gas_query_ap.c"/>
+        <files mask="gas_serv.c"/>
+      </source>
+      <source relative_path="./src/eap_common" project_relative_path="src/eap_common" type="src">
+        <files mask="eap_common.c"/>
+        <files mask="eap_wsc_common.c"/>
+        <files mask="eap_peap_common.c"/>
+        <files mask="chap.c"/>
+        <files mask="eap_fast_common.c"/>
+        <files mask="eap_sim_common.c"/>
+      </source>
+      <source relative_path="./src/eap_server" project_relative_path="src/eap_server" type="src">
+        <files mask="eap_server.c"/>
+        <files mask="eap_server_identity.c"/>
+        <files mask="eap_server_methods.c"/>
+        <files mask="eap_server_wsc.c"/>
+        <files mask="eap_server_tls.c"/>
+        <files mask="eap_sim_db.c"/>
+        <files mask="eap_server_ttls.c"/>
+        <files mask="eap_server_tls_common.c"/>
+        <files mask="eap_server_peap.c"/>
+        <files mask="eap_server_mschapv2.c"/>
+        <files mask="eap_server_md5.c"/>
+        <files mask="eap_server_gtc.c"/>
+        <files mask="eap_server_fast.c"/>
+        <files mask="eap_server_sim.c"/>
+        <files mask="eap_server_aka.c"/>
+      </source>
+      <source relative_path="./src/eapol_auth" project_relative_path="src/eapol_auth" type="src">
+        <files mask="eapol_auth_sm.c"/>
+      </source>
+      <source relative_path="./src/crypto" project_relative_path="src/crypto" type="src">
+        <files mask="aes-eax.c"/>
+        <files mask="aes-encblock.c"/>
+        <files mask="aes-ctr.c"/>
+        <files mask="aes-cbc.c"/>
+        <files mask="aes-siv.c"/>
+        <files mask="aes-unwrap.c"/>
+        <files mask="aes-wrap.c"/>
+        <files mask="des-internal.c"/>
+        <files mask="dh_groups.c"/>
+        <files mask="rc4.c"/>
+        <files mask="md4-internal.c"/>
+        <files mask="md5.c"/>
+        <files mask="md5-internal.c"/>
+        <files mask="sha1-internal.c"/>
+        <files mask="fips_prf_internal.c"/>
+        <files mask="sha256-internal.c"/>
+        <files mask="sha1.c"/>
+        <files mask="sha256.c"/>
+        <files mask="tls_none.c"/>
+        <files mask="ms_funcs.c"/>
+        <files mask="sha1-tlsprf.c"/>
+        <files mask="sha1-prf.c"/>
+        <files mask="sha256-prf.c"/>
+        <files mask="sha1-pbkdf2.c"/>
+        <files mask="aes-omac1.c"/>
+        <files mask="aes-internal-enc.c"/>
+        <files mask="aes-internal-dec.c"/>
+        <files mask="aes-internal.c"/>
+        <files mask="crypto_mbedtls2.c"/>
+        <files mask="tls_mbedtls2.c"/>
+        <files mask="sha256-kdf.c"/>
+        <files mask="sha384-kdf.c"/>
+        <files mask="sha512-kdf.c"/>
+        <files mask="milenage.c"/>
+      </source>
+      <source relative_path="./src/rsn_supp" project_relative_path="src/rsn_supp" type="src">
+        <files mask="wpa.c"/>
+        <files mask="preauth.c"/>
+        <files mask="pmksa_cache.c"/>
+        <files mask="wpa_ie.c"/>
+        <files mask="wpa_ft.c"/>
+      </source>
+      <source relative_path="./src/p2p" project_relative_path="src/p2p" type="src">
+        <files mask="p2p.c"/>
+        <files mask="p2p_utils.c"/>
+        <files mask="p2p_parse.c"/>
+        <files mask="p2p_build.c"/>
+        <files mask="p2p_go_neg.c"/>
+        <files mask="p2p_sd.c"/>
+        <files mask="p2p_pd.c"/>
+        <files mask="p2p_invitation.c"/>
+        <files mask="p2p_dev_disc.c"/>
+        <files mask="p2p_group.c"/>
+      </source>
+      <source relative_path="./src/eap_peer" project_relative_path="src/eap_peer" type="src">
+        <files mask="eap_wsc.c"/>
+        <files mask="eap.c"/>
+        <files mask="eap_methods.c"/>
+        <files mask="eap_tls.c"/>
+        <files mask="eap_tls_common.c"/>
+        <files mask="eap_peap.c"/>
+        <files mask="eap_ttls.c"/>
+        <files mask="eap_mschapv2.c"/>
+        <files mask="mschapv2.c"/>
+        <files mask="eap_fast.c"/>
+        <files mask="eap_fast_pac.c"/>
+        <files mask="eap_gtc.c"/>
+        <files mask="eap_sim.c"/>
+        <files mask="eap_aka.c"/>
+      </source>
+      <source relative_path="./src/wps" project_relative_path="src/wps" type="src">
+        <files mask="wps.c"/>
+        <files mask="wps_common.c"/>
+        <files mask="wps_attr_parse.c"/>
+        <files mask="wps_attr_build.c"/>
+        <files mask="wps_attr_process.c"/>
+        <files mask="wps_dev_attr.c"/>
+        <files mask="wps_enrollee.c"/>
+        <files mask="wps_registrar.c"/>
+      </source>
+      <source relative_path="./src/eapol_supp" project_relative_path="src/eapol_supp" type="src">
+        <files mask="eapol_supp_sm.c"/>
+      </source>
+      <source relative_path="./hostapd" project_relative_path="hostapd" type="src">
+        <files mask="hlr_auc_gw.c"/>
+        <files mask="ctrl_iface.c"/>
+        <files mask="eap_register.c"/>
+      </source>
+      <source relative_path="./hostapd" project_relative_path="hostapd" type="c_include">
+        <files mask="config_file.h"/>
+        <files mask="ctrl_iface.h"/>
+        <files mask="eap_register.h"/>
+      </source>
+      <source relative_path="./hostapd" project_relative_path="hostapd" type="other">
+        <files mask="README"/>
+      </source>
+      <source relative_path="./src/radius" project_relative_path="src/radius" type="src">
+        <files mask="radius_server.c"/>
+        <files mask="radius_das.c"/>
+        <files mask="radius_client.c"/>
+        <files mask="radius.c"/>
+      </source>
+      <source relative_path="./src/ap" project_relative_path="src/ap" type="c_include">
+        <files mask="acs.h"/>
+        <files mask="accounting.h"/>
+        <files mask="airtime_policy.h"/>
+        <files mask="ap_config.h"/>
+        <files mask="ap_drv_ops.h"/>
+        <files mask="ap_list.h"/>
+        <files mask="ap_mlme.h"/>
+        <files mask="authsrv.h"/>
+        <files mask="beacon.h"/>
+        <files mask="bss_load.h"/>
+        <files mask="ctrl_iface_ap.h"/>
+        <files mask="dfs.h"/>
+        <files mask="dhcp_snoop.h"/>
+        <files mask="dpp_hostapd.h"/>
+        <files mask="eth_p_oui.h"/>
+        <files mask="fils_hlp.h"/>
+        <files mask="gas_query_ap.h"/>
+        <files mask="gas_serv.h"/>
+        <files mask="hostapd.h"/>
+        <files mask="hs20.h"/>
+        <files mask="hw_features.h"/>
+        <files mask="ieee802_11_auth.h"/>
+        <files mask="ieee802_11.h"/>
+        <files mask="ieee802_1x.h"/>
+        <files mask="mbo_ap.h"/>
+        <files mask="ndisc_snoop.h"/>
+        <files mask="neighbor_db.h"/>
+        <files mask="p2p_hostapd.h"/>
+        <files mask="pmksa_cache_auth.h"/>
+        <files mask="preauth_auth.h"/>
+        <files mask="rrm.h"/>
+        <files mask="sta_info.h"/>
+        <files mask="taxonomy.h"/>
+        <files mask="tkip_countermeasures.h"/>
+        <files mask="vlan.h"/>
+        <files mask="vlan_init.h"/>
+        <files mask="vlan_util.h"/>
+        <files mask="wmm.h"/>
+        <files mask="wnm_ap.h"/>
+        <files mask="wpa_auth_glue.h"/>
+        <files mask="wpa_auth.h"/>
+        <files mask="wpa_auth_ie.h"/>
+        <files mask="wpa_auth_i.h"/>
+        <files mask="wpa_auth_kay.h"/>
+        <files mask="wps_hostapd.h"/>
+        <files mask="x_snoop.h"/>
+      </source>
+      <source relative_path="./src/tls" project_relative_path="src/tls" type="src">
+        <files mask="asn1.c"/>
+      </source>
+      <source relative_path="./src/common" project_relative_path="src/common" type="c_include">
+        <files mask="brcm_vendor.h"/>
+        <files mask="cli.h"/>
+        <files mask="ctrl_iface_common.h"/>
+        <files mask="defs.h"/>
+        <files mask="dhcp.h"/>
+        <files mask="dpp.h"/>
+        <files mask="dpp_i.h"/>
+        <files mask="dragonfly.h"/>
+        <files mask="eapol_common.h"/>
+        <files mask="gas.h"/>
+        <files mask="gas_server.h"/>
+        <files mask="hw_features_common.h"/>
+        <files mask="ieee802_11_common.h"/>
+        <files mask="ieee802_11_defs.h"/>
+        <files mask="ieee802_1x_defs.h"/>
+        <files mask="linux_bridge.h"/>
+        <files mask="linux_vlan.h"/>
+        <files mask="ocv.h"/>
+        <files mask="privsep_commands.h"/>
+        <files mask="ptksa_cache.h"/>
+        <files mask="qca-vendor-attr.h"/>
+        <files mask="qca-vendor.h"/>
+        <files mask="sae.h"/>
+        <files mask="tnc.h"/>
+        <files mask="version.h"/>
+        <files mask="wpa_common.h"/>
+        <files mask="wpa_ctrl.h"/>
+        <files mask="wpa_helpers.h"/>
+      </source>
+      <source relative_path="./src/drivers" project_relative_path="src/drivers" type="c_include">
+        <files mask="driver.h"/>
+        <files mask="driver_hostap.h"/>
+        <files mask="driver_freertos.h"/>
+        <files mask="rfkill.h"/>
+      </source>
+      <source relative_path="./src/eapol_auth" project_relative_path="src/eapol_auth" type="c_include">
+        <files mask="eapol_auth_sm.h"/>
+        <files mask="eapol_auth_sm_i.h"/>
+      </source>
+      <source relative_path="./src/eap_peer" project_relative_path="src/eap_peer" type="c_include">
+        <files mask="eap_config.h"/>
+        <files mask="eap_fast_pac.h"/>
+        <files mask="eap.h"/>
+        <files mask="eap_i.h"/>
+        <files mask="eap_methods.h"/>
+        <files mask="eap_proxy.h"/>
+        <files mask="eap_teap_pac.h"/>
+        <files mask="eap_tls_common.h"/>
+        <files mask="ikev2.h"/>
+        <files mask="mschapv2.h"/>
+        <files mask="tncc.h"/>
+      </source>
+      <source relative_path="./src/fst" project_relative_path="src/fst" type="c_include">
+        <files mask="fst_ctrl_aux.h"/>
+        <files mask="fst_ctrl_defs.h"/>
+        <files mask="fst_ctrl_iface.h"/>
+        <files mask="fst_defs.h"/>
+        <files mask="fst_group.h"/>
+        <files mask="fst.h"/>
+        <files mask="fst_iface.h"/>
+        <files mask="fst_internal.h"/>
+        <files mask="fst_session.h"/>
+      </source>
+      <source relative_path="./src/pae" project_relative_path="src/pae" type="c_include">
+        <files mask="ieee802_1x_cp.h"/>
+        <files mask="ieee802_1x_kay.h"/>
+        <files mask="ieee802_1x_kay_i.h"/>
+        <files mask="ieee802_1x_key.h"/>
+        <files mask="ieee802_1x_secy_ops.h"/>
+      </source>
+      <source relative_path="./src/rsn_supp" project_relative_path="src/rsn_supp" type="c_include">
+        <files mask="pmksa_cache.h"/>
+        <files mask="preauth.h"/>
+        <files mask="wpa.h"/>
+        <files mask="wpa_ie.h"/>
+        <files mask="wpa_i.h"/>
+      </source>
+      <source relative_path="./src/crypto" project_relative_path="src/crypto" type="c_include">
+        <files mask="aes.h"/>
+        <files mask="aes_i.h"/>
+        <files mask="aes_siv.h"/>
+        <files mask="aes_wrap.h"/>
+        <files mask="crypto.h"/>
+        <files mask="des_i.h"/>
+        <files mask="dh_group5.h"/>
+        <files mask="dh_groups.h"/>
+        <files mask="md5.h"/>
+        <files mask="md5_i.h"/>
+        <files mask="milenage.h"/>
+        <files mask="ms_funcs.h"/>
+        <files mask="random.h"/>
+        <files mask="sha1.h"/>
+        <files mask="sha1_i.h"/>
+        <files mask="sha256.h"/>
+        <files mask="sha256_i.h"/>
+        <files mask="sha384.h"/>
+        <files mask="sha384_i.h"/>
+        <files mask="sha512.h"/>
+        <files mask="sha512_i.h"/>
+        <files mask="tls.h"/>
+      </source>
+      <source relative_path="./src/eap_common" project_relative_path="src/eap_common" type="c_include">
+        <files mask="chap.h"/>
+        <files mask="eap_common.h"/>
+        <files mask="eap_defs.h"/>
+        <files mask="eap_eke_common.h"/>
+        <files mask="eap_fast_common.h"/>
+        <files mask="eap_gpsk_common.h"/>
+        <files mask="eap_ikev2_common.h"/>
+        <files mask="eap_pax_common.h"/>
+        <files mask="eap_peap_common.h"/>
+        <files mask="eap_psk_common.h"/>
+        <files mask="eap_pwd_common.h"/>
+        <files mask="eap_sake_common.h"/>
+        <files mask="eap_sim_common.h"/>
+        <files mask="eap_teap_common.h"/>
+        <files mask="eap_tlv_common.h"/>
+        <files mask="eap_ttls.h"/>
+        <files mask="eap_wsc_common.h"/>
+        <files mask="ikev2_common.h"/>
+      </source>
+      <source relative_path="./src/eapol_supp" project_relative_path="src/eapol_supp" type="c_include">
+        <files mask="eapol_supp_sm.h"/>
+      </source>
+      <source relative_path="./src/eap_server" project_relative_path="src/eap_server" type="c_include">
+        <files mask="eap.h"/>
+        <files mask="eap_i.h"/>
+        <files mask="eap_methods.h"/>
+        <files mask="eap_sim_db.h"/>
+        <files mask="eap_tls_common.h"/>
+        <files mask="ikev2.h"/>
+        <files mask="tncs.h"/>
+      </source>
+      <source relative_path="./src/p2p" project_relative_path="src/p2p" type="c_include">
+        <files mask="p2p.h"/>
+        <files mask="p2p_i.h"/>
+      </source>
+      <source relative_path="./src/radius" project_relative_path="src/radius" type="c_include">
+        <files mask="radius_client.h"/>
+        <files mask="radius_das.h"/>
+        <files mask="radius.h"/>
+        <files mask="radius_server.h"/>
+      </source>
+      <source relative_path="./src/tls" project_relative_path="src/tls" type="c_include">
+        <files mask="asn1.h"/>
+        <files mask="bignum.h"/>
+        <files mask="pkcs1.h"/>
+        <files mask="pkcs5.h"/>
+        <files mask="pkcs8.h"/>
+        <files mask="rsa.h"/>
+        <files mask="tlsv1_client.h"/>
+        <files mask="tlsv1_client_i.h"/>
+        <files mask="tlsv1_common.h"/>
+        <files mask="tlsv1_cred.h"/>
+        <files mask="tlsv1_record.h"/>
+        <files mask="tlsv1_server.h"/>
+        <files mask="tlsv1_server_i.h"/>
+        <files mask="x509v3.h"/>
+      </source>
+      <source relative_path="./src/wps" project_relative_path="src/wps" type="c_include">
+        <files mask="http_client.h"/>
+        <files mask="http.h"/>
+        <files mask="httpread.h"/>
+        <files mask="http_server.h"/>
+        <files mask="upnp_xml.h"/>
+        <files mask="wps_attr_parse.h"/>
+        <files mask="wps_defs.h"/>
+        <files mask="wps_dev_attr.h"/>
+        <files mask="wps_er.h"/>
+        <files mask="wps.h"/>
+        <files mask="wps_i.h"/>
+        <files mask="wps_upnp.h"/>
+        <files mask="wps_upnp_i.h"/>
+      </source>
+      <source toolchain="armgcc" relative_path="./" type="workspace">
+        <files mask="middleware_wireless_wpa_supplicant_rtos.cmake" hidden="true"/>
+      </source>
+      <include_paths>
+        <include_path relative_path="./" type="c_include"/>
+        <include_path relative_path="./src" project_relative_path="src" type="c_include"/>
+        <include_path relative_path="./src/utils" project_relative_path="src/utils" type="c_include"/>
+        <include_path relative_path="./src/common" project_relative_path="src/common" type="c_include"/>
+        <include_path relative_path="./src/crypto" project_relative_path="src/crypto" type="c_include"/>
+        <include_path relative_path="./src/ap" project_relative_path="src/ap" type="c_include"/>
+        <include_path relative_path="./src/drivers" project_relative_path="src/drivers" type="c_include"/>
+        <include_path relative_path="./src/eap_common" project_relative_path="src/eap_common" type="c_include"/>
+        <include_path relative_path="./src/eap_peer" project_relative_path="src/eap_peer" type="c_include"/>
+        <include_path relative_path="./src/eap_server" project_relative_path="src/eap_server" type="c_include"/>
+        <include_path relative_path="./src/eapol_auth" project_relative_path="src/eapol_auth" type="c_include"/>
+        <include_path relative_path="./src/eapol_supp" project_relative_path="src/eapol_supp" type="c_include"/>
+        <include_path relative_path="./src/fst" project_relative_path="src/fst" type="c_include"/>
+        <include_path relative_path="./src/l2_packet" project_relative_path="src/l2_packet" type="c_include"/>
+        <include_path relative_path="./src/p2p" project_relative_path="src/p2p" type="c_include"/>
+        <include_path relative_path="./src/pae" project_relative_path="src/pae" type="c_include"/>
+        <include_path relative_path="./src/radius" project_relative_path="src/radius" type="c_include"/>
+        <include_path relative_path="./src/rsn_supp" project_relative_path="src/rsn_supp" type="c_include"/>
+        <include_path relative_path="./src/tls" project_relative_path="src/tls" type="c_include"/>
+        <include_path relative_path="./src/wps" project_relative_path="src/wps" type="c_include"/>
+        <include_path relative_path="./port/mbedtls" project_relative_path="port/mbedtls" type="c_include"/>
+        <include_path relative_path="./hostapd" project_relative_path="hostapd" type="c_include"/>
+        <include_path relative_path="./wpa_supplicant" project_relative_path="wpa_supplicant" type="c_include"/>
+        <include_path relative_path="./freertos" project_relative_path="freertos" type="c_include"/>
+        <include_path relative_path="./freertos/src" project_relative_path="freertos/src" type="c_include"/>
+      </include_paths>
+    </component>
+  </components>
+</ksdk:manifest>
