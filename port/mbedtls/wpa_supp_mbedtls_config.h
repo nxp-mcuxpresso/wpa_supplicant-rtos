@@ -4392,6 +4392,9 @@ void *pvPortCalloc(size_t num, size_t size); /*Calloc for HEAP3.*/
  * Allow user to override any previous default.
  *
  */
+
+#define MBEDTLS_ALLOW_PRIVATE_ACCESS
+
 #if defined(MBEDTLS_USER_CONFIG_FILE)
 #include MBEDTLS_USER_CONFIG_FILE
 #endif

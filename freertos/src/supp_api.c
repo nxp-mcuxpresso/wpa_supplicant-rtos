@@ -31,6 +31,7 @@
 #include "crypto/tls.h"
 #include "wpa_supplicant/scan.h"
 #include "wpa_supplicant/sme.h"
+#include "rsn_supp/pmksa_cache.h"
 
 #ifdef CONFIG_HOSTAPD
 #include "ap/hostapd.h"
@@ -48,6 +49,8 @@
 #define EAP_TTLS_AUTH_CHAP     2
 #define EAP_TTLS_AUTH_MSCHAP   4
 #define EAP_TTLS_AUTH_MSCHAPV2 8
+
+#define UAP_DTIM_PERIOD 1
 
 enum supp_thread_state
 {
@@ -1229,6 +1232,10 @@ static int hostapd_update_bss(struct hostapd_iface *hapd_s, struct wlan_network 
     conf->no_pri_sec_switch = 1;
     conf->ht_op_mode_fixed  = 1;
 
+#ifdef CONFIG_WIFI_DTIM_PERIOD
+    bss->dtim_period = network->dtim_period == 0 ? UAP_DTIM_PERIOD : network->dtim_period;
+#endif
+
     ssid           = &bss->ssid;
     ssid->ssid_len = os_strlen(network->ssid);
     if (ssid->ssid_len > SSID_MAX_LEN || ssid->ssid_len < 1)
@@ -1676,7 +1683,6 @@ static void hostapd_reset_bss(struct hostapd_bss_config *bss)
 
     bss->tls_flags     = 0;
     bss->ieee802_1x    = 0;
-    bss->eapol_version = 0;
     bss->eap_server    = 0;
 
     bss->sae_pwe = 0;
@@ -1873,6 +1879,12 @@ int wpa_supp_add_network(const struct netif *dev, struct wlan_network *network)
 
         ssid->ssid_len = os_strlen(network->ssid);
         memcpy(ssid->ssid, network->ssid, ssid->ssid_len);
+        if (network->bssid_specific)
+        {
+            memcpy(ssid->bssid, network->bssid, IEEEtypes_ADDRESS_SIZE);
+            ssid->bssid_set = 1;
+        }
+
         ssid->disabled = 1;
         ssid->key_mgmt = network->security.key_mgmt;
         ssid->scan_ssid = 1;
@@ -2033,6 +2045,27 @@ int wpa_supp_add_network(const struct netif *dev, struct wlan_network *network)
                     {
                         ssid->key_mgmt  = WPA_KEY_MGMT_IEEE8021X_SUITE_B_192;
                         openssl_ciphers = "SUITEB192";
+#ifdef CONFIG_WPA_SUPP_CRYPTO_ENTERPRISE
+#ifdef CONFIG_EAP_TLS
+                        if (network->security.tls_cipher == EAP_TLS_ECC_P384)
+                        {
+                            /* Per WiFi Cert WPA3 test plan 19.5.2 step 1, STAUT should only send
+                             * TLS_ECDHE_ECDSA_AES_256_GCM_SHA384 as the TLS cipher in the Client
+                             * Hello frame during EAP exchange */
+                            str_clear_free(ssid->eap.openssl_ciphers);
+                            ssid->eap.openssl_ciphers = dup_binstr(openssl_ciphers, os_strlen(openssl_ciphers));
+                        }
+                        else if (network->security.tls_cipher == EAP_TLS_RSA_3K)
+                        {
+                            /* Per WiFi Cert WPA3 test plan 19.5.2 step 4, STAUT should only send
+                             * TLS_ECDHE_RSA_AES_256_GCM_SHA384 and TLS_DHE_RSA_AES_256_GCM_SHA384
+                             * as the TLS ciphers in the Client Hello frame during EAP exchange */
+                            os_snprintf(phase1, sizeof(phase1), "tls_suiteb=1");
+                            str_clear_free(ssid->eap.phase1);
+                            ssid->eap.phase1 = dup_binstr(phase1, os_strlen(phase1));
+                        }
+#endif
+#endif
                     }
                     else if (network->security.wpa3_sb)
                     {
@@ -2095,7 +2128,7 @@ int wpa_supp_add_network(const struct netif *dev, struct wlan_network *network)
                 if (os_strlen(network->security.ca_cert_hash))
                 {
                     str2hex(network->security.ca_cert_hash, HashH);
-                    os_snprintf(hashstr, os_strlen(hashstr), "hash://server/sha256/%s", HashH);
+                    os_snprintf(hashstr, sizeof(hashstr), "hash://server/sha256/%s", HashH);
                     str_clear_free(ssid->eap.cert.ca_cert);
                     ssid->eap.cert.ca_cert = dup_binstr(hashstr, os_strlen(hashstr));
                 }
@@ -2627,6 +2660,8 @@ int wpa_supp_disconnect(const struct netif *dev)
 
     wpa_s->scan_res_fail_handler = NULL;
 
+    wpa_config_remove_blob(wpa_s->conf, "eap-fast-pac");
+
     eapol_sm_invalidate_cached_session(wpa_s->eapol);
     wpas_request_disconnection(wpa_s);
 
@@ -2722,6 +2757,7 @@ int wpa_supp_remove_network(const struct netif *dev, struct wlan_network *networ
                 wpa_config_remove_blob(wpa_s->conf, "ca_cert2");
                 wpa_config_remove_blob(wpa_s->conf, "cloent_cert2");
                 wpa_config_remove_blob(wpa_s->conf, "private_key2");
+                wpa_config_remove_blob(wpa_s->conf, "eap-fast-pac");
                 break;
 #endif
             default:
@@ -2809,6 +2845,7 @@ int wpa_supp_pmksa_flush(const struct netif *dev)
         goto out;
     }
 
+    pmksa_cache_clear_current(wpa_s->wpa);
     ptksa_cache_flush(wpa_s->ptksa, NULL, WPA_CIPHER_NONE);
     wpa_sm_pmksa_cache_flush(wpa_s->wpa, NULL);
 #ifdef CONFIG_AP
@@ -3015,6 +3052,10 @@ int wpa_supp_start_ap(const struct netif *dev, struct wlan_network *network, int
     bss->ignore_broadcast_ssid = h_hidden_ssid;
     conf->beacon_int = h_beacon_int;
     bss->max_num_sta = h_max_num_sta;
+    if(!bss->ignore_broadcast_ssid)
+    {
+        bss->wps_state = WPS_STATE_CONFIGURED;
+    }
 
     if (bandwidth == 1)
     {
@@ -4750,6 +4791,12 @@ int wpa_supp_network_status(const struct netif *dev, struct wlan_network *networ
                     network->wps_network   = true;
                     network->security.type = wpas_key_mgmt_to_wpa(ssid->key_mgmt);
 
+                    if (ssid->ieee80211w == MGMT_FRAME_PROTECTION_DEFAULT)
+                    {
+                        network->security.mfpc = 0;
+                        network->security.mfpr = 0;
+                    }
+
                     if (ssid->export_keys)
                     {
                         if (ssid->psk_set)
@@ -4933,6 +4980,11 @@ int wpa_supp_init(void (*msg_cb)(const char *txt, size_t len))
     }
 #endif
 
+    bandwidth = 2;
+    h_hidden_ssid = 0;
+    h_beacon_int = 100;
+    h_max_num_sta = 8;
+
     return 0;
 }
 
@@ -4964,4 +5016,36 @@ int wpa_supp_deinit(void)
 #endif
 
     return 0;
+}
+
+void hostapd_connected_sta_list(wifi_sta_info_t *si, wifi_sta_list_t *sl)
+{
+    struct hostapd_iface *hapd_s;
+    struct netif *netif       = net_get_uap_interface();
+    hapd_s                    = get_hostapd_handle(netif);
+    struct hostapd_data *hapd = hapd_s->bss[0];
+    struct sta_info *sta;
+    int count = 0, i = 0;
+
+    for (sta = hapd->sta_list; sta; sta = sta->next)
+        count++;
+
+    PRINTF("\r\nNumber of STA = %d\r\n", count);
+
+    for (sta = hapd->sta_list; sta; sta = sta->next)
+    {
+        PRINTF("\r\nSTA %d information:\n\r", sta->aid);
+        PRINTF("=====================\r\n");
+        PRINTF("MAC Address: %02X:%02X:%02X:%02X:%02X:%02X\r\n", sta->addr[0], sta->addr[1], sta->addr[2], sta->addr[3],
+               sta->addr[4], sta->addr[5]);
+        for (i = 0; i < sl->count; i++)
+        {
+          if (memcmp(si[i].mac, sta->addr, MLAN_MAC_ADDR_LENGTH) == 0)
+          {
+                PRINTF("Power mfg status: %s\r\n", (si[i].power_mgmt_status == 0U) ? "active" : "power save");
+                PRINTF("Rssi : %d dBm\r\n\r\n", (signed char)si[i].rssi);
+                break;
+          }
+        }
+    }
 }

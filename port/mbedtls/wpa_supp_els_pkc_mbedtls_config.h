@@ -24,8 +24,8 @@
  *  limitations under the License.
  */
 
-#ifndef MBEDTLS_CONFIG_H
-#define MBEDTLS_CONFIG_H
+#ifndef MBEDTLS_USER_CONFIG_H
+#define MBEDTLS_USER_CONFIG_H
 
 #if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_DEPRECATE)
 #define _CRT_SECURE_NO_DEPRECATE 1
@@ -49,6 +49,23 @@ void *pvPortCalloc(size_t num, size_t size); /*Calloc for HEAP3.*/
 
 #endif /* USE_RTOS*/
 #endif /* CONFIG_ZEPHYR */
+
+#ifdef CONFIG_WPA_SUPP_CRYPTO_MBEDTLS_PSA
+#define MBEDTLS_CTR_DRBG_ENABLED
+#define MBEDTLS_CIPHER_AES_ENABLED
+#define MBEDTLS_CIPHER_MODE_CBC_ENABLED
+#define MBEDTLS_CIPHER_PADDING_PKCS7
+#define PSA_CRYPTO_DRIVER_ELS_PKC
+#define PSA_CRYPTO_DRIVER_THREAD_EN
+
+#define MBEDTLS_PSA_ACCEL_ALG_MD5
+#define MBEDTLS_PSA_ACCEL_ALG_SHA_1
+#define MBEDTLS_PSA_ACCEL_ALG_SHA_224
+#define MBEDTLS_PSA_ACCEL_ALG_SHA_256
+#define MBEDTLS_PSA_ACCEL_ALG_SHA_384
+#define MBEDTLS_PSA_ACCEL_ALG_SHA_512
+#define MBEDTLS_PSA_ACCEL_ALG_RIPEMD160
+#endif
 
 /**************************** MCUX CSS_PKC end ****************************************/
 /**
@@ -904,7 +921,9 @@ void *pvPortCalloc(size_t num, size_t size); /*Calloc for HEAP3.*/
  *       library may modify the way the ECDH context layout is configured
  *       and may modify the layout of the new context type.
  */
-//#define MBEDTLS_ECDH_LEGACY_CONTEXT
+#ifdef MBEDTLS_ECDH_LEGACY_CONTEXT
+#undef MBEDTLS_ECDH_LEGACY_CONTEXT
+#endif
 
 /**
  * \def MBEDTLS_ECDSA_DETERMINISTIC
@@ -2640,7 +2659,7 @@ void *pvPortCalloc(size_t num, size_t size); /*Calloc for HEAP3.*/
  *
  * This module provides debugging functions.
  */
-#define MBEDTLS_DEBUG_C
+//#define MBEDTLS_DEBUG_C
 
 /**
  * \def MBEDTLS_DES_C
@@ -3964,6 +3983,9 @@ void *pvPortCalloc(size_t num, size_t size); /*Calloc for HEAP3.*/
  */
 //#define MBEDTLS_CBC_MAC_USE_CMAC
 
+/* Uncomment if you do not want PSA wrapper inside Mbedtls */
+//#undef MBEDTLS_USE_PSA_CRYPTO
+
 /* \} name SECTION: Customisation configuration options */
 
 /* Target and application specific configurations
@@ -3971,6 +3993,10 @@ void *pvPortCalloc(size_t num, size_t size); /*Calloc for HEAP3.*/
  * Allow user to override any previous default.
  *
  */
+
+#define MBEDTLS_ALLOW_PRIVATE_ACCESS
+
+#ifndef CONFIG_ZEPHYR
 #if defined(MBEDTLS_USER_CONFIG_FILE)
 #include MBEDTLS_USER_CONFIG_FILE
 #endif
@@ -3980,5 +4006,5 @@ void *pvPortCalloc(size_t num, size_t size); /*Calloc for HEAP3.*/
 #endif
 
 #include "mbedtls/check_config.h"
-
-#endif /* MBEDTLS_CONFIG_H */
+#endif /* CONFIG_ZEPHYR */
+#endif /* MBEDTLS_USER_CONFIG_H */

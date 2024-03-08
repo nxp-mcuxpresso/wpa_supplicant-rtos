@@ -23,6 +23,10 @@
 #include <mbedtls/sha256.h>
 #include <mbedtls/sha512.h>
 
+#ifdef CONFIG_WPA_SUPP_CRYPTO_MBEDTLS_PSA
+#include "supp_psa_api.h"
+#endif
+
 #ifndef MBEDTLS_PRIVATE
 #define MBEDTLS_PRIVATE(x) x
 #endif
@@ -289,6 +293,9 @@ int crypto_get_random(void *buf, size_t len)
 __attribute_noinline__ static int md_vector(
     size_t num_elem, const u8 *addr[], const size_t *len, u8 *mac, mbedtls_md_type_t md_type)
 {
+#ifdef CONFIG_WPA_SUPP_CRYPTO_MBEDTLS_PSA
+    return md_vector_psa(num_elem, addr, len, mac, md_type);
+#else
     if (TEST_FAIL())
         return -1;
 
@@ -305,6 +312,7 @@ __attribute_noinline__ static int md_vector(
     mbedtls_md_finish(&ctx, mac);
     mbedtls_md_free(&ctx);
     return 0;
+#endif
 }
 
 #ifdef MBEDTLS_SHA512_C
@@ -575,6 +583,9 @@ __attribute_noinline__ static int hmac_vector(const u8 *key,
                                               u8 *mac,
                                               mbedtls_md_type_t md_type)
 {
+#ifdef CONFIG_WPA_SUPP_CRYPTO_MBEDTLS_PSA
+    return hmac_vector_psa(key, key_len, num_elem, addr, len, mac, md_type);
+#else
     if (TEST_FAIL())
         return -1;
 
@@ -591,6 +602,7 @@ __attribute_noinline__ static int hmac_vector(const u8 *key,
     mbedtls_md_hmac_finish(&ctx, mac);
     mbedtls_md_free(&ctx);
     return 0;
+#endif
 }
 
 #ifdef MBEDTLS_SHA512_C
@@ -1146,6 +1158,9 @@ int aes_unwrap(const u8 *kek, size_t kek_len, int n, const u8 *cipher, u8 *plain
 
 int omac1_aes_vector(const u8 *key, size_t key_len, size_t num_elem, const u8 *addr[], const size_t *len, u8 *mac)
 {
+#ifdef CONFIG_WPA_SUPP_CRYPTO_MBEDTLS_PSA
+    return omac1_aes_vector_psa(key, key_len, num_elem, addr, len, mac);
+#else
     if (TEST_FAIL())
         return -1;
 
@@ -1182,6 +1197,7 @@ int omac1_aes_vector(const u8 *key, size_t key_len, size_t num_elem, const u8 *a
         ret = mbedtls_cipher_cmac_finish(&ctx, mac);
     mbedtls_cipher_free(&ctx);
     return ret ? -1 : 0;
+#endif
 }
 
 int omac1_aes_128_vector(const u8 *key, size_t num_elem, const u8 *addr[], const size_t *len, u8 *mac)
@@ -1218,6 +1234,9 @@ int omac1_aes_256(const u8 *key, const u8 *data, size_t data_len, u8 *mac)
 /* aes-encblock.c */
 int aes_128_encrypt_block(const u8 *key, const u8 *in, u8 *out)
 {
+#ifdef CONFIG_WPA_SUPP_CRYPTO_MBEDTLS_PSA
+    return aes_128_encrypt_block_psa(key, in, out);
+#else
     if (TEST_FAIL())
         return -1;
 
@@ -1227,11 +1246,15 @@ int aes_128_encrypt_block(const u8 *key, const u8 *in, u8 *out)
         mbedtls_aes_setkey_enc(&aes, key, 128) || mbedtls_aes_crypt_ecb(&aes, MBEDTLS_AES_ENCRYPT, in, out) ? -1 : 0;
     mbedtls_aes_free(&aes);
     return ret;
+#endif
 }
 
 /* aes-ctr.c */
 int aes_ctr_encrypt(const u8 *key, size_t key_len, const u8 *nonce, u8 *data, size_t data_len)
 {
+#ifdef CONFIG_WPA_SUPP_CRYPTO_MBEDTLS_PSA
+    return aes_ctr_encrypt_psa(key, key_len, nonce, data, data_len);
+#else
     if (TEST_FAIL())
         return -1;
 
@@ -1249,6 +1272,7 @@ int aes_ctr_encrypt(const u8 *key, size_t key_len, const u8 *nonce, u8 *data, si
     forced_memzero(stream_block, sizeof(stream_block));
     mbedtls_aes_free(&ctx);
     return ret;
+#endif
 }
 
 int aes_128_ctr_encrypt(const u8 *key, const u8 *nonce, u8 *data, size_t data_len)
@@ -1259,6 +1283,12 @@ int aes_128_ctr_encrypt(const u8 *key, const u8 *nonce, u8 *data, size_t data_le
 /* aes-cbc.c */
 static int aes_128_cbc_oper(const u8 *key, const u8 *iv, u8 *data, size_t data_len, int mode)
 {
+#ifdef CONFIG_WPA_SUPP_CRYPTO_MBEDTLS_PSA
+    if (mode == MBEDTLS_AES_ENCRYPT)
+        return aes_128_cbc_encrypt_psa(key, iv, data, data_len);
+    else
+        return aes_128_cbc_decrypt_psa(key, iv, data, data_len);
+#else
     unsigned char ivec[MBEDTLS_AES_BLOCK_SIZE];
     os_memcpy(ivec, iv, MBEDTLS_AES_BLOCK_SIZE); /*(must be writable)*/
 
@@ -1269,6 +1299,7 @@ static int aes_128_cbc_oper(const u8 *key, const u8 *iv, u8 *data, size_t data_l
               mbedtls_aes_crypt_cbc(&ctx, mode, data_len, ivec, data, data);
     mbedtls_aes_free(&ctx);
     return ret ? -1 : 0;
+#endif
 }
 
 int aes_128_cbc_encrypt(const u8 *key, const u8 *iv, u8 *data, size_t data_len)
@@ -2322,10 +2353,14 @@ struct crypto_ecdh *crypto_ecdh_init_owe(int group)
     mbedtls_ctr_drbg_context ctr_drbg;
     mbedtls_entropy_context entropy;
     mbedtls_ecdh_context *ctx;
-
     /* Initialize CTR_DRBG context */
     mbedtls_ctr_drbg_init(&ctr_drbg);
     mbedtls_entropy_init(&entropy);
+
+#ifdef CONFIG_ZEPHYR
+    mbedtls_entropy_add_source(&entropy, wm_wrap_entropy_poll, NULL, ENTROPY_MIN_PLATFORM,
+                               MBEDTLS_ENTROPY_SOURCE_STRONG);
+#endif
 
     ctx = os_zalloc(sizeof(*ctx));
     if (!ctx)
@@ -2516,6 +2551,10 @@ struct wpabuf *crypto_ecdh_set_peerkey_owe(struct crypto_ecdh *ecdh, int inc_y, 
     /* Initialize CTR_DRBG context */
     mbedtls_ctr_drbg_init(&ctr_drbg);
     mbedtls_entropy_init(&entropy);
+#ifdef CONFIG_ZEPHYR
+    mbedtls_entropy_add_source(&entropy, wm_wrap_entropy_poll, NULL, ENTROPY_MIN_PLATFORM,
+                               MBEDTLS_ENTROPY_SOURCE_STRONG);
+#endif
 
     /* Seed and setup CTR_DRBG entropy source for future reseeds */
     if (mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy, NULL, 0) != 0)

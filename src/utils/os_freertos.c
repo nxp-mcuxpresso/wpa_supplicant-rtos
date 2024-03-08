@@ -248,7 +248,14 @@ char *os_strdup(const char *s)
 
 void *os_memdup(const void *src, size_t len)
 {
-    void *r = os_malloc(len);
+    void *r = NULL;
+
+    if (len == 0)
+    {
+        len++;
+    }
+
+    r = os_malloc(len);
 
     if (r && src)
     {

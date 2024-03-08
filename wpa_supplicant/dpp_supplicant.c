@@ -3706,7 +3706,7 @@ static void wpas_dpp_chirp_tx_status(struct wpa_supplicant *wpa_s,
     }
 
     wpa_printf(MSG_DEBUG, "DPP: Chirp send completed - wait for response");
-#if defined(CONFIG_FREERTOS)
+#if defined(CONFIG_FREERTOS) || defined(CONFIG_ZEPHYR)
     if (eloop_register_timeout(5, 0, wpas_dpp_chirp_timeout, wpa_s, NULL) < 0) /* 2 -> 5 for debug enable when send gas_resp and wait conf result */
 #else
     if (eloop_register_timeout(2, 0, wpas_dpp_chirp_timeout, wpa_s, NULL) < 0)

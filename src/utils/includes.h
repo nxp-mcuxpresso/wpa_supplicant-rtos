@@ -195,12 +195,8 @@
 
 #ifdef CONFIG_WPA_SUPP_DPP
 #define CONFIG_DPP
-#ifdef CONFIG_WPA_SUPP_DPP2
 #define CONFIG_DPP2
-#endif
-#ifdef CONFIG_WPA_SUPP_DPP3
 #define CONFIG_DPP3
-#endif
 #define CONFIG_GAS
 #define CONFIG_OFFCHANNEL
 #define CONFIG_GAS_SERVER
@@ -277,7 +273,9 @@
 #endif
 #ifdef CONFIG_EAP_AKA_PRIME
 #define EAP_AKA_PRIME
+#ifndef CONFIG_EAP_AKA
 #define CONFIG_EAP_AKA
+#endif
 #endif
 #ifdef CONFIG_EAP_AKA
 #define EAP_AKA
@@ -311,7 +309,9 @@
 #endif
 #ifdef CONFIG_EAP_AKA_PRIME
 #define EAP_SERVER_AKA_PRIME
+#ifndef CONFIG_EAP_AKA
 #define CONFIG_EAP_AKA
+#endif
 #endif
 #ifdef CONFIG_EAP_AKA
 #define EAP_SERVER_AKA

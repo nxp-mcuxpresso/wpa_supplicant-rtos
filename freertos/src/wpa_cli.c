@@ -56,7 +56,7 @@ static struct cli_command wpa_cli[] = {
 //    {"wpa_cli", "<standard wpa cli options>", test_wpa_cli},
 #ifdef CONFIG_HOSTAPD
 //    {"hostapd_cli", "<standard hostapd cli options>", test_hostapd_cli},
-    {"hlr_cli", "<standard hlr cli options>", test_hlr_cli},
+    {"wlan-hlr-cli", "<standard hlr cli options>", test_hlr_cli},
 #endif
 };
 

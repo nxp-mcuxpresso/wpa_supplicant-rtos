@@ -61,8 +61,8 @@
 
 #ifdef MBEDTLS_DEBUG_C
 #define DEBUG_THRESHOLD 4
-#ifdef CONFIG_ZEPHYR
 #include <mbedtls/debug.h>
+#ifdef CONFIG_ZEPHYR
 #define PRINTF printk
 #else
 #include "fsl_debug_console.h"
@@ -327,10 +327,10 @@ void tls_mbedtls_set_debug_cb(mbedtls_ssl_config *conf,
     {
         /**
          * If 'NULL' dbg function and already set 'g_f_dbg',
-         * we will not override it.
+         * we will not override 'g_f_dbg',
+         * but set it in conf.
          */
-        elog(-1, "Cannot override dbg function");
-        return;
+        mbedtls_ssl_conf_dbg(conf, g_f_dbg, NULL);
     }
     else if (f_dbg)
     {
@@ -3122,7 +3122,7 @@ static int tls_mbedtls_verify_cb(void *arg, mbedtls_x509_crt *crt, int depth, ui
     struct tls_conf *tls_conf   = conn->tls_conf;
     uint32_t flags_in           = *flags;
 
-#ifdef TLS_MBEDTLS_CERT_DISABLE_KEY_USAGE_CHECK
+#if defined(TLS_MBEDTLS_CERT_DISABLE_KEY_USAGE_CHECK)
     crt->ext_types &= ~MBEDTLS_X509_EXT_KEY_USAGE;
     crt->ext_types &= ~MBEDTLS_X509_EXT_EXTENDED_KEY_USAGE;
 #endif

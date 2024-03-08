@@ -10,7 +10,7 @@
 
 #include "fsl_os_abstraction.h"
 #ifdef CONFIG_ZEPHYR
-#include "wm_net_decl.h"
+#include "wm_net.h"
 #else
 #include <lwip/sys.h>
 #include <lwip/netif.h>
@@ -93,7 +93,7 @@ struct wpa_global *global;
 
 #ifdef CONFIG_ZEPHYR
 
-const int WPA_SUPP_TASK_PRIO       = CONFIG_WIFI_MAX_PRIO + 1; //OS_PRIO_2;
+const int WPA_SUPP_TASK_PRIO       = CONFIG_WIFI_MAX_PRIO + 2; //OS_PRIO_2;
 
 struct k_thread suppMainTask;
 k_tid_t supplicant_thread;
@@ -460,17 +460,22 @@ out:
 #ifdef CONFIG_WPA_SUPP_CRYPTO
 static bool crypto_init_done = false;
 #endif
-
+#ifdef CONFIG_WPA_SUPP_CRYPTO_MBEDTLS_PSA
+#include "supp_psa_api.h"
+#endif
 int start_wpa_supplicant(char *iface_name)
 {
     int ret = 0;
 
-#ifdef CONFIG_WPA_SUPP_CRYPTO
+#if defined(CONFIG_WPA_SUPP_CRYPTO) && !defined(CONFIG_ZEPHYR)
     if (crypto_init_done == false)
     {
         CRYPTO_InitHardware();
         crypto_init_done = true;
     }
+#endif
+#ifdef CONFIG_WPA_SUPP_CRYPTO_MBEDTLS_PSA
+    supp_nxp_crypto_init();
 #endif
 
 #ifdef CONFIG_ZEPHYR
@@ -915,6 +920,13 @@ struct hostapd_config *hostapd_config_read2(const char *fname)
     struct hostapd_config *conf;
     int errors = 0;
     size_t i;
+#ifdef RW610
+    int aCWmin = 4, aCWmax = 10;
+    struct hostapd_wmm_ac_params ac_bk = {aCWmin, aCWmax, 9, 0, 0}; /* background traffic */
+    struct hostapd_wmm_ac_params ac_be = {aCWmin, aCWmax - 4, 5, 0, 0}; /* best effort traffic */
+    struct hostapd_wmm_ac_params ac_vi = {aCWmin - 1, aCWmin, 3, 3008 / 32, 0}; /* video traffic */
+    struct hostapd_wmm_ac_params ac_vo = {aCWmin - 2, aCWmin - 1, 3, 1504 / 32, 0}; /* voice traffic */
+#endif
 
     netif = net_get_uap_interface();
 
@@ -935,6 +947,12 @@ struct hostapd_config *hostapd_config_read2(const char *fname)
         // fclose(f);
         return NULL;
     }
+#ifdef RW610
+    conf->wmm_ac_params[0] = ac_be;
+    conf->wmm_ac_params[1] = ac_bk;
+    conf->wmm_ac_params[2] = ac_vi;
+    conf->wmm_ac_params[3] = ac_vo;
+#endif
     /* set default driver based on configuration */
     conf->driver = wpa_drivers[0];
     if (conf->driver == NULL)
