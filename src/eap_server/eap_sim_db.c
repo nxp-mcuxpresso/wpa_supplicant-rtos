@@ -754,14 +754,18 @@ static void process_eap_sim_db_event(struct eap_sim_db_data *data)
                     "external source",
                     (u8 *)buf, res);
                 if (res == 0)
-                  return;
+                {
+                  os_free(buf);
+                  continue;
+                }
 
                 if (data->get_complete_cb == NULL)
                 {
                   wpa_printf(MSG_DEBUG,
                       "EAP-SIM DB: No get_complete_cb "
                       "registered");
-                  return;
+                  os_free(buf);
+                  continue;
                 }
 
                 /* <cmd> <IMSI> ... */
@@ -787,7 +791,8 @@ static void process_eap_sim_db_event(struct eap_sim_db_data *data)
                       "EAP-SIM DB: Unknown external response "
                       "'%s'",
                       cmd);
-                return;
+                os_free(buf);
+                continue;
 
 parse_fail:
                 wpa_printf(MSG_DEBUG, "EAP-SIM DB: Failed to parse response string");

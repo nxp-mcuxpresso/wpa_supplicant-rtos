@@ -1790,6 +1790,15 @@ static int hostapd_free_bss(struct hostapd_iface *hapd_s, struct wlan_network *n
         case WLAN_SECURITY_EAP_PEAP_GTC:
 #endif
 #endif
+#if CONFIG_EAP_SIM
+        case WLAN_SECURITY_EAP_SIM:
+#endif
+#if CONFIG_EAP_AKA
+        case WLAN_SECURITY_EAP_AKA:
+#endif
+#if CONFIG_EAP_AKA_PRIME
+        case WLAN_SECURITY_EAP_AKA_PRIME:
+#endif
 #if CONFIG_EAP_FAST
 #if CONFIG_EAP_MSCHAPV2
         case WLAN_SECURITY_EAP_FAST_MSCHAPV2:

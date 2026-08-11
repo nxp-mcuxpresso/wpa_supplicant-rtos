@@ -1242,7 +1242,10 @@ static void process_hlr_event()
                 res = os_strlen(buf);
 
                 if (res == 0)
-                  return;
+                {
+                    os_free(buf);
+                    continue;
+                }
 
                 PRINTF("Received: %s\r\n", buf);
 
@@ -1250,21 +1253,24 @@ static void process_hlr_event()
 
                 if (resp == NULL)
                 {
-                    return;
+                    os_free(buf);
+                    continue;
                 }
 
                 if (process_cmd(buf, resp, 1000) < 0)
                 {
                     PRINTF("Failed to process request\r\n");
                     os_free(resp);
-                    return;
+                    os_free(buf);
+                    continue;
                 }
 
                 if (resp[0] == '\0')
                 {
                     PRINTF("No response\r\n");
                     os_free(resp);
-                    return;
+                    os_free(buf);
+                    continue;
                 }
 
                 PRINTF("Send: %s\r\n", resp);
