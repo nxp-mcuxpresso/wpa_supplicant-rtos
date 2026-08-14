@@ -313,6 +313,7 @@ if(CONFIG_MCUX_COMPONENT_middleware.wireless.wpa_supplicant.rtos)
                 src/common/dragonfly.h
                 src/common/eapol_common.h
                 src/common/gas.h
+                src/common/gas_server.h
                 src/common/hw_features_common.h
                 src/common/ieee802_11_common.h
                 src/common/ieee802_11_defs.h
@@ -532,7 +533,6 @@ if (CONFIG_MCUX_COMPONENT_middleware.wireless.wpa_supplicant.rtos.hostapd)
                 src/ap/eth_p_oui.c
                 src/ap/eth_p_oui.h
                 src/ap/gas_serv.c
-                src/common/gas_server.h
         BASE_PATH ${SdkRootDirPath}/middleware/wireless/wpa_supplicant-rtos/
     )
 
