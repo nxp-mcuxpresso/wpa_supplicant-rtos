@@ -32,7 +32,7 @@ void supp_set_mbedtls_set_time()
 #endif
 }
 
-#ifdef MBEDTLS_PLATFORM_TIME_ALT
+#ifdef MBEDTLS_PLATFORM_MS_TIME_ALT
 mbedtls_ms_time_t mbedtls_ms_time(void)
 {
     return (mbedtls_ms_time_t)OSA_GetTimestamp();
