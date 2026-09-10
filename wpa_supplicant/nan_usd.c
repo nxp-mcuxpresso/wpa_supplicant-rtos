@@ -551,10 +551,4 @@ int * wpas_nan_usd_all_freqs(struct wpa_supplicant *wpa_s)
 
 	return freqs;
 }
-
-void wpas_nan_usd_update_mac_addr(struct wpa_supplicant *wpa_s)
-{
-	if (wpa_s->nan_de)
-		nan_de_update_nmi(wpa_s->nan_de, wpa_s->own_addr);
-}
 #endif /* CONFIG_NAN_USD */
